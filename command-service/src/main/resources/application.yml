@@ -1,0 +1,99 @@
+spring:
+  application:
+    name: ratings-command-service
+  
+  # Database configuration
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ratings_write}
+    username: ${DB_USERNAME:ratings_user}
+    password: ${DB_PASSWORD:ratings_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${DB_LEAK_DETECTION_THRESHOLD:60000}
+  
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+  
+  # Flyway configuration for database migrations
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  
+  # Kafka configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: ${KAFKA_PRODUCER_ACKS:all}
+      retries: ${KAFKA_PRODUCER_RETRIES:3}
+      batch-size: ${KAFKA_PRODUCER_BATCH_SIZE:16384}
+      linger-ms: ${KAFKA_PRODUCER_LINGER_MS:5}
+      buffer-memory: ${KAFKA_PRODUCER_BUFFER_MEMORY:33554432}
+      properties:
+        enable.idempotence: ${KAFKA_PRODUCER_IDEMPOTENCE:true}
+        max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_MAX_IN_FLIGHT:1}
+        compression.type: ${KAFKA_PRODUCER_COMPRESSION:snappy}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      request.timeout.ms: ${KAFKA_REQUEST_TIMEOUT:30000}
+      delivery.timeout.ms: ${KAFKA_DELIVERY_TIMEOUT:120000}
+
+# gRPC server configuration
+grpc:
+  server:
+    port: ${GRPC_PORT:9090}
+    enable-reflection: true
+
+# HTTP server configuration (for health checks and actuator)
+server:
+  port: ${HTTP_PORT:8081}
+
+# Actuator configuration for health checks and monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  health:
+    db:
+      enabled: true
+    kafka:
+      enabled: true
+
+# Logging configuration
+logging:
+  level:
+    com.ratings: ${LOG_LEVEL:INFO}
+    org.springframework.kafka: WARN
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${SQL_LOG_LEVEL:WARN}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application-specific configuration
+ratings:
+  kafka:
+    topic:
+      rating-events: ${KAFKA_RATING_EVENTS_TOPIC:rating-events}
+  validation:
+    max-review-text-length: 2000

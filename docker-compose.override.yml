@@ -1,0 +1,64 @@
+# Development overrides for docker-compose.yml
+services:
+  # Add Kafka UI for development
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: ratings-kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+
+  # Development overrides for services
+  postgres:
+    environment:
+      POSTGRES_USER: ratings_user
+      POSTGRES_PASSWORD: ratings_pass
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
+
+  command-service:
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ratings_write
+      DB_USERNAME: ratings_user
+      DB_PASSWORD: ratings_pass
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      # Development settings
+      LOGGING_LEVEL_COM_RATINGS: DEBUG
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+    volumes:
+      # Mount source code for hot reload (if using spring-boot-devtools)
+      - ./command-service/src:/app/src:ro
+
+  query-service:
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ratings_read
+      DB_USERNAME: ratings_user
+      DB_PASSWORD: ratings_pass
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_CONSUMER_GROUP_ID: ratings-projector-dev
+      # Development settings
+      LOGGING_LEVEL_COM_RATINGS: DEBUG
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+      GRAPHQL_SCHEMA_PRINTER_ENABLED: true
+    volumes:
+      # Mount source code for hot reload (if using spring-boot-devtools)
+      - ./query-service/src:/app/src:ro
+
+volumes:
+  postgres_data:

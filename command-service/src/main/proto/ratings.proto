@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package com.ratings;
+
+option java_multiple_files = true;
+option java_package = "com.ratings.command.grpc";
+option java_outer_classname = "RatingsProto";
+
+// Service definition for ratings command operations
+service RatingsCommandService {
+  // Submit a new product rating
+  rpc SubmitRating (SubmitRatingCommand) returns (SubmitRatingResponse);
+}
+
+// Command message for submitting a rating
+message SubmitRatingCommand {
+  // Product identifier (required)
+  string product_id = 1;
+  
+  // Rating value from 1 to 5 (required)
+  int32 rating = 2;
+  
+  // User identifier (optional)
+  string user_id = 3;
+  
+  // Review text content (optional)
+  string review_text = 4;
+}
+
+// Response message for rating submission
+message SubmitRatingResponse {
+  // Unique identifier for the submitted review
+  string submission_id = 1;
+  
+  // Status of the submission (SUCCESS, VALIDATION_ERROR, INTERNAL_ERROR)
+  string status = 2;
+  
+  // Additional message with details (especially for errors)
+  string message = 3;
+}

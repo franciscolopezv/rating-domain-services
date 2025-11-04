@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+docs/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Build artifacts
+target/
+build/
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Test resources
+**/src/test/
+
+# Integration tests
+integration-tests/
+
+# Scripts (except init scripts)
+scripts/
+!scripts/init-*.sql
+
+# Environment files
+.env*
+!.env.example
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Node modules (if any)
+node_modules/
+
+# Maven wrapper (keep mvnw files)
+!.mvn/
+!mvnw
+!mvnw.cmd

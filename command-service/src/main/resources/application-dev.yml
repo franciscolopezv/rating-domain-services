@@ -1,0 +1,61 @@
+# Development environment configuration
+spring:
+  # Database configuration for development
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 900000
+      leak-detection-threshold: 30000
+  
+  # JPA configuration for development
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Kafka configuration for development
+  kafka:
+    producer:
+      retries: 1
+      batch-size: 1024
+      linger-ms: 0
+      properties:
+        max.in.flight.requests.per.connection: 5
+
+# gRPC server configuration
+grpc:
+  server:
+    enable-reflection: true
+
+# Actuator configuration for development
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+# Logging configuration for development
+logging:
+  level:
+    com.ratings: DEBUG
+    org.springframework.kafka: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.transaction: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application-specific configuration for development
+ratings:
+  validation:
+    max-review-text-length: 1000
+  security:
+    grpc:
+      enabled: false  # Disable gRPC security for development/testing

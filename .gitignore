@@ -1,0 +1,342 @@
+# ===================================
+# Java Spring Boot Best Practices
+# ===================================
+
+# ===== MAVEN =====
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+pom.xml.bak
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/local-repo/
+# Note: Maven wrapper files (.mvn/wrapper/) should be included in version control
+
+# ===== GRADLE =====
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ===== JAVA =====
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# ===== SPRING BOOT =====
+# Spring Boot specific
+BOOT-INF/
+META-INF/
+
+# Application properties (keep templates, exclude sensitive configs)
+application-*.properties
+application-*.yml
+application-*.yaml
+!application.properties
+!application.yml
+!application.yaml
+!application-dev.properties
+!application-dev.yml
+!application-dev.yaml
+!application-test.properties
+!application-test.yml
+!application-test.yaml
+!application-local.properties
+!application-local.yml
+!application-local.yaml
+
+# Spring Boot DevTools
+.spring-boot-devtools.properties
+
+# Spring Boot Actuator
+actuator/
+
+# ===== DATABASE =====
+# H2 Database
+*.db
+*.h2.db
+*.mv.db
+*.trace.db
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# Derby
+derby.log
+*.lck
+
+# HSQLDB
+*.hsqldb
+
+# Database migration files (keep schema, exclude data)
+**/data.sql
+**/import.sql
+
+# ===== TESTING =====
+# Test results
+test-results/
+**/target/surefire-reports/
+**/target/failsafe-reports/
+**/target/site/
+
+# Coverage reports
+coverage/
+.coverage
+*.lcov
+jacoco.exec
+**/target/jacoco.exec
+
+# JUnit
+junit/
+.junit/
+
+# TestNG
+test-output/
+
+# ===== IDE =====
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.project
+.classpath
+.factorypath
+.buildpath
+.target
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===== OPERATING SYSTEM =====
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===== DOCKER =====
+.docker/
+.dockerignore.bak
+docker-compose.override.yml.bak
+
+# ===== KUBERNETES =====
+*.kubeconfig
+.kube/
+
+# ===== SECURITY & SECRETS =====
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Secrets and keys
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*.truststore
+secrets/
+.secrets/
+
+# OAuth and JWT
+oauth.properties
+jwt.properties
+
+# ===== LOGS =====
+logs/
+*.log
+*.log.*
+log/
+application.log*
+spring.log*
+logback.log*
+
+# ===== TEMPORARY FILES =====
+tmp/
+temp/
+*.tmp
+*.temp
+.tmp/
+
+# ===== GENERATED FILES =====
+generated/
+generated-sources/
+generated-test-sources/
+.generated/
+
+# Protocol Buffers
+**/target/generated-sources/protobuf/
+
+# OpenAPI/Swagger
+**/target/generated-sources/openapi/
+
+# ===== MONITORING & METRICS =====
+# Micrometer/Prometheus
+*.prom
+
+# JMX
+jmxremote.password
+jmxremote.access
+
+# ===== CACHING =====
+# Spring Cache
+.cache/
+cache/
+
+# Redis dump
+dump.rdb
+
+# ===== DOCUMENTATION =====
+# Generated documentation
+**/target/generated-docs/
+**/target/asciidoc/
+
+# ===== MICROSERVICES =====
+# Service discovery
+.eureka/
+
+# Configuration server
+config-repo/
+
+# ===== CLOUD =====
+# AWS
+.aws/
+aws-exports.js
+
+# Google Cloud
+.gcloud/
+gcloud-service-key.json
+
+# Azure
+.azure/
+
+# ===== PERFORMANCE =====
+# JProfiler
+*.jprofile
+
+# YourKit
+*.hprof
+
+# JVM Crash dumps
+*.hprof
+*.dump
+
+# ===== MISC =====
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# Node.js (for frontend assets)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package-lock files (if using npm/yarn for frontend)
+package-lock.json
+yarn.lock
+.kiro

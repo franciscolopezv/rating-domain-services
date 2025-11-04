@@ -1,0 +1,141 @@
+spring:
+  application:
+    name: ratings-query-service
+  
+  # Database configuration
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ratings_read}
+    username: ${DB_USERNAME:ratings_user}
+    password: ${DB_PASSWORD:ratings_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:2}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:20000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:300000}
+      max-lifetime: ${DB_MAX_LIFETIME:1200000}
+      leak-detection-threshold: ${DB_LEAK_DETECTION_THRESHOLD:60000}
+  
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+  
+  # GraphQL configuration
+  graphql:
+    websocket:
+      path: /graphql
+    path: /graphql
+    cors:
+      allowed-origins: "*"
+      allowed-methods: GET,POST
+  
+  # Kafka configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:ratings-query-service}
+      auto-offset-reset: ${KAFKA_CONSUMER_AUTO_OFFSET_RESET:earliest}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      max-poll-records: ${KAFKA_CONSUMER_MAX_POLL_RECORDS:500}
+      fetch-min-bytes: ${KAFKA_CONSUMER_FETCH_MIN_BYTES:1024}
+      fetch-max-wait: ${KAFKA_CONSUMER_FETCH_MAX_WAIT:500}
+      session-timeout: ${KAFKA_CONSUMER_SESSION_TIMEOUT:30000}
+      heartbeat-interval: ${KAFKA_CONSUMER_HEARTBEAT_INTERVAL:3000}
+      properties:
+        spring.json.trusted.packages: "com.ratings.shared.events"
+        spring.json.type.mapping: "RatingSubmittedEvent:com.ratings.shared.events.RatingSubmittedEvent"
+        request.timeout.ms: ${KAFKA_REQUEST_TIMEOUT:30000}
+        retry.backoff.ms: ${KAFKA_RETRY_BACKOFF:100}
+    listener:
+      ack-mode: ${KAFKA_LISTENER_ACK_MODE:manual_immediate}
+      concurrency: ${KAFKA_LISTENER_CONCURRENCY:3}
+      poll-timeout: ${KAFKA_LISTENER_POLL_TIMEOUT:3000}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+
+# Server configuration
+server:
+  port: 8082
+  servlet:
+    context-path: /
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  health:
+    db:
+      enabled: true
+    kafka:
+      enabled: true
+
+# Logging configuration
+logging:
+  level:
+    com.ratings.query: INFO
+    org.springframework.kafka: WARN
+    org.springframework.graphql: DEBUG
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Custom application properties
+app:
+  kafka:
+    topics:
+      rating-events: rating-events
+    dead-letter-topic: rating-events-dlt
+  projection:
+    batch-size: 100
+    retry-attempts: 3
+    retry-delay: 1000
+  graphql:
+    federation:
+      enabled: true
+      service-name: ratings-query-service
+      service-url: http://localhost:8082/graphql
+
+---
+# Test profile
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+
+---
+# Docker profile
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://postgres:5432/ratings_read
+  kafka:
+    bootstrap-servers: kafka:9092

@@ -1,0 +1,74 @@
+# Development environment configuration
+spring:
+  # Database configuration for development
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 15000
+      idle-timeout: 200000
+      max-lifetime: 600000
+      leak-detection-threshold: 30000
+  
+  # JPA configuration for development
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # GraphQL configuration for development
+  graphql:
+    schema:
+      printer:
+        enabled: true
+    websocket:
+      path: /graphql
+    cors:
+      allowed-origins: "*"
+      allowed-methods: GET,POST,OPTIONS
+      allowed-headers: "*"
+  
+  # Kafka configuration for development
+  kafka:
+    consumer:
+      group-id: ratings-query-service-dev
+      max-poll-records: 100
+      fetch-min-bytes: 1
+      fetch-max-wait: 100
+    listener:
+      concurrency: 1
+      poll-timeout: 1000
+
+# Actuator configuration for development
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+# Logging configuration for development
+logging:
+  level:
+    com.ratings.query: DEBUG
+    org.springframework.kafka: INFO
+    org.springframework.graphql: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Custom application properties for development
+app:
+  projection:
+    batch-size: 10
+    retry-attempts: 1
+    retry-delay: 500
+  graphql:
+    federation:
+      enabled: true
+      service-name: ratings-query-service-dev
+      service-url: http://localhost:8082/graphql

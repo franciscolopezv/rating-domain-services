@@ -1,0 +1,62 @@
+directive @key(fields: String!) on OBJECT | INTERFACE
+directive @extends on OBJECT | INTERFACE
+directive @external on FIELD_DEFINITION
+directive @requires(fields: String!) on FIELD_DEFINITION
+directive @provides(fields: String!) on FIELD_DEFINITION
+
+# Product type with key field for federation - this service only provides rating information
+type Product @key(fields: "id") {
+  id: ID!
+  averageRating: Float
+  reviewCount: Int
+  ratingDistribution: RatingDistribution
+}
+
+# Rating distribution type showing count of ratings by star level
+type RatingDistribution {
+  oneStar: Int!
+  twoStar: Int!
+  threeStar: Int!
+  fourStar: Int!
+  fiveStar: Int!
+  total: Int!
+  mostCommonRating: Int
+  hasPositiveRatings: Boolean!
+  hasNegativeRatings: Boolean!
+  diversityScore: Float
+}
+
+# Query type for direct rating statistics queries
+type Query {
+  # Get a product by ID (for federation and direct queries)
+  product(id: ID!): Product
+  
+  # Get rating statistics for a specific product
+  productRatingStats(productId: ID!): ProductRatingStats
+  
+  # Get top-rated products
+  topRatedProducts(limit: Int = 10): [ProductRatingStats!]!
+  
+  # Get most reviewed products
+  mostReviewedProducts(limit: Int = 10): [ProductRatingStats!]!
+  
+  # Get overall rating statistics
+  overallRatingStats: OverallRatingStats
+}
+
+# Standalone product rating statistics type
+type ProductRatingStats {
+  productId: ID!
+  averageRating: Float
+  reviewCount: Int!
+  ratingDistribution: RatingDistribution
+  lastUpdated: String
+}
+
+# Overall system rating statistics
+type OverallRatingStats {
+  totalProducts: Int!
+  totalReviews: Int!
+  overallAverageRating: Float
+  productsWithRatings: Int!
+}

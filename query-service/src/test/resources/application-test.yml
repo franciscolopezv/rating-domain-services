@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: ratings-query-service-test
+  
+  # H2 in-memory database for testing
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  # JPA configuration for testing
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Kafka configuration for testing
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.ratings.shared.events"
+        spring.json.type.mapping: "RatingSubmittedEvent:com.ratings.shared.events.RatingSubmittedEvent"
+
+# Logging configuration for tests
+logging:
+  level:
+    com.ratings.query: DEBUG
+    org.springframework.kafka: WARN
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Custom application properties for testing
+app:
+  kafka:
+    topics:
+      rating-events: test_rating_events
+    dead-letter-topic: test_rating_events_dlt
+  projection:
+    batch-size: 10
+    retry-attempts: 2
+    retry-delay: 100
