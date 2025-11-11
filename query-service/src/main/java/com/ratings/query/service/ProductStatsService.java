@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +45,7 @@ public class ProductStatsService {
     /**
      * Gets product rating statistics by product ID.
      *
-     * @param productId the product ID
+     * @param productId the product ID as string
      * @return optional containing the product statistics if found
      */
     public Optional<ProductStatsDto> getProductStats(String productId) {
@@ -53,13 +54,17 @@ public class ProductStatsService {
         long startTime = System.currentTimeMillis();
         
         try {
-            Optional<ProductStatsDto> result = productStatsRepository.findByProductId(productId)
+            UUID uuid = UUID.fromString(productId);
+            Optional<ProductStatsDto> result = productStatsRepository.findByProductId(uuid)
                     .map(this::convertToDto);
             
             long executionTime = System.currentTimeMillis() - startTime;
             monitoringService.recordDatabaseOperation("getProductStats", executionTime);
             
             return result;
+        } catch (IllegalArgumentException e) {
+            logger.warn("Invalid UUID format for product ID: {}", productId);
+            return Optional.empty();
         } catch (Exception e) {
             long executionTime = System.currentTimeMillis() - startTime;
             monitoringService.recordDatabaseError("getProductStats", e.getClass().getSimpleName());
@@ -70,14 +75,20 @@ public class ProductStatsService {
     /**
      * Gets product rating statistics for GraphQL queries.
      *
-     * @param productId the product ID
+     * @param productId the product ID as string
      * @return optional containing the product rating stats if found
      */
     public Optional<ProductRatingStats> getProductRatingStats(String productId) {
         logger.debug("Getting product rating stats for GraphQL query, product ID: {}", productId);
         
-        return productStatsRepository.findByProductId(productId)
-                .map(this::convertToGraphQLType);
+        try {
+            UUID uuid = UUID.fromString(productId);
+            return productStatsRepository.findByProductId(uuid)
+                    .map(this::convertToGraphQLType);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Invalid UUID format for product ID: {}", productId);
+            return Optional.empty();
+        }
     }
 
     /**
@@ -142,8 +153,9 @@ public class ProductStatsService {
     public ProductStatsDto saveProductStats(ProductStatsDto productStatsDto) {
         logger.debug("Saving product stats for product ID: {}", productStatsDto.getProductId());
         
-        ProductStats entity = productStatsRepository.findByProductId(productStatsDto.getProductId())
-                .orElse(new ProductStats(productStatsDto.getProductId()));
+        UUID uuid = UUID.fromString(productStatsDto.getProductId());
+        ProductStats entity = productStatsRepository.findByProductId(uuid)
+                .orElse(new ProductStats(uuid));
         
         entity.setAverageRating(productStatsDto.getAverageRating());
         entity.setReviewCount(productStatsDto.getReviewCount());
@@ -160,29 +172,37 @@ public class ProductStatsService {
     /**
      * Checks if product statistics exist for a given product ID.
      *
-     * @param productId the product ID
+     * @param productId the product ID as string
      * @return true if statistics exist
      */
     public boolean hasProductStats(String productId) {
-        return productStatsRepository.existsByProductId(productId);
+        try {
+            UUID uuid = UUID.fromString(productId);
+            return productStatsRepository.existsByProductId(uuid);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Invalid UUID format for product ID: {}", productId);
+            return false;
+        }
     }
 
     /**
      * Creates a new empty product statistics record.
      *
-     * @param productId the product ID
+     * @param productId the product ID as string
      * @return the created product statistics
      */
     @Transactional
     public ProductStatsDto createEmptyProductStats(String productId) {
         logger.debug("Creating empty product stats for product ID: {}", productId);
         
-        if (productStatsRepository.existsByProductId(productId)) {
+        UUID uuid = UUID.fromString(productId);
+        
+        if (productStatsRepository.existsByProductId(uuid)) {
             logger.warn("Product stats already exist for product ID: {}", productId);
             return getProductStats(productId).orElse(null);
         }
         
-        ProductStats entity = new ProductStats(productId);
+        ProductStats entity = new ProductStats(uuid);
         ProductStats savedEntity = productStatsRepository.save(entity);
         
         logger.info("Created empty product stats for product ID: {}", productId);

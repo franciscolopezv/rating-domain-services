@@ -11,13 +11,14 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository interface for ProductStats entity operations.
  * Provides methods for querying and updating aggregated product rating statistics.
  */
 @Repository
-public interface ProductStatsRepository extends JpaRepository<ProductStats, String> {
+public interface ProductStatsRepository extends JpaRepository<ProductStats, UUID> {
 
     /**
      * Finds product statistics by product ID.
@@ -25,7 +26,7 @@ public interface ProductStatsRepository extends JpaRepository<ProductStats, Stri
      * @param productId the product ID
      * @return optional containing the product statistics if found
      */
-    Optional<ProductStats> findByProductId(String productId);
+    Optional<ProductStats> findByProductId(UUID productId);
 
     /**
      * Finds all products with ratings above a specified threshold.
@@ -111,14 +112,14 @@ public interface ProductStatsRepository extends JpaRepository<ProductStats, Stri
     @Modifying
     @Query(value = """
         INSERT INTO product_stats (product_id, average_rating, review_count, rating_distribution, last_updated)
-        VALUES (:productId, :averageRating, :reviewCount, CAST(:ratingDistribution AS jsonb), CURRENT_TIMESTAMP)
+        VALUES (CAST(:productId AS UUID), :averageRating, :reviewCount, CAST(:ratingDistribution AS jsonb), CURRENT_TIMESTAMP)
         ON CONFLICT (product_id) DO UPDATE SET
             average_rating = EXCLUDED.average_rating,
             review_count = EXCLUDED.review_count,
             rating_distribution = EXCLUDED.rating_distribution,
             last_updated = CURRENT_TIMESTAMP
         """, nativeQuery = true)
-    int upsertProductStats(@Param("productId") String productId,
+    int upsertProductStats(@Param("productId") UUID productId,
                           @Param("averageRating") BigDecimal averageRating,
                           @Param("reviewCount") Integer reviewCount,
                           @Param("ratingDistribution") String ratingDistribution);
@@ -140,5 +141,5 @@ public interface ProductStatsRepository extends JpaRepository<ProductStats, Stri
      * @param productId the product ID
      * @return true if statistics exist for the product
      */
-    boolean existsByProductId(String productId);
+    boolean existsByProductId(UUID productId);
 }

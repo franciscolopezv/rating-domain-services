@@ -29,7 +29,7 @@ from typing import Dict, Any, Optional
 COMMAND_SERVICE_HOST = "localhost"
 COMMAND_SERVICE_PORT = 9090
 QUERY_SERVICE_HOST = "localhost"
-QUERY_SERVICE_PORT = 8082
+QUERY_SERVICE_PORT = 8083
 PRODUCT_ID = "P123"
 PRODUCT_NAME = "My PoC Product"
 

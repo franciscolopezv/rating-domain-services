@@ -28,8 +28,8 @@ public class Review implements ReviewEntity {
     private UUID reviewId;
     
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private String productId;
+    @Column(name = "product_id", nullable = false, columnDefinition = "UUID")
+    private UUID productId;
     
     @NotNull
     @Min(1)
@@ -57,7 +57,7 @@ public class Review implements ReviewEntity {
     }
     
     // Constructor for creating new reviews
-    public Review(String productId, Integer rating, String userId, String reviewText) {
+    public Review(UUID productId, Integer rating, String userId, String reviewText) {
         this();
         this.productId = productId;
         this.rating = rating;
@@ -84,10 +84,18 @@ public class Review implements ReviewEntity {
     
     @Override
     public String getProductId() {
-        return productId;
+        return productId != null ? productId.toString() : null;
     }
     
     public void setProductId(String productId) {
+        this.productId = productId != null ? UUID.fromString(productId) : null;
+    }
+    
+    public UUID getProductIdAsUUID() {
+        return productId;
+    }
+    
+    public void setProductIdAsUUID(UUID productId) {
         this.productId = productId;
     }
     

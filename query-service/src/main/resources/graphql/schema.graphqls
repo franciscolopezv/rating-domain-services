@@ -42,7 +42,24 @@ type Query {
   
   # Get overall rating statistics
   overallRatingStats: OverallRatingStats
+  
+  # Federation service query - required for Apollo Federation
+  _service: _Service!
+  
+  # Federation entities query - required for entity resolution
+  _entities(representations: [_Any!]!): [_Entity]!
 }
+
+# Federation service type
+type _Service {
+  sdl: String!
+}
+
+# Federation entity union - includes all federated types
+union _Entity = Product
+
+# Federation scalar for entity representations
+scalar _Any
 
 # Standalone product rating statistics type
 type ProductRatingStats {

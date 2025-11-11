@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * JPA entity representing aggregated product statistics in the read database.
@@ -20,8 +21,8 @@ import java.util.Objects;
 public class ProductStats implements ProductStatsEntity {
 
     @Id
-    @Column(name = "product_id", nullable = false)
-    private String productId;
+    @Column(name = "product_id", nullable = false, columnDefinition = "UUID")
+    private UUID productId;
 
     @Column(name = "average_rating", precision = 3, scale = 2)
     private BigDecimal averageRating;
@@ -48,7 +49,7 @@ public class ProductStats implements ProductStatsEntity {
      *
      * @param productId the product ID
      */
-    public ProductStats(String productId) {
+    public ProductStats(UUID productId) {
         this.productId = productId;
         this.reviewCount = 0;
         this.ratingDistribution = initializeRatingDistribution();
@@ -63,7 +64,7 @@ public class ProductStats implements ProductStatsEntity {
      * @param reviewCount the review count
      * @param ratingDistribution the rating distribution
      */
-    public ProductStats(String productId, BigDecimal averageRating, Integer reviewCount, Map<Integer, Integer> ratingDistribution) {
+    public ProductStats(UUID productId, BigDecimal averageRating, Integer reviewCount, Map<Integer, Integer> ratingDistribution) {
         this.productId = productId;
         this.averageRating = averageRating;
         this.reviewCount = reviewCount;
@@ -146,10 +147,18 @@ public class ProductStats implements ProductStatsEntity {
 
     @Override
     public String getProductId() {
-        return productId;
+        return productId != null ? productId.toString() : null;
     }
 
     public void setProductId(String productId) {
+        this.productId = productId != null ? UUID.fromString(productId) : null;
+    }
+    
+    public UUID getProductIdAsUUID() {
+        return productId;
+    }
+    
+    public void setProductIdAsUUID(UUID productId) {
         this.productId = productId;
     }
 

@@ -31,6 +31,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/actuator/**").authenticated()
+                .requestMatchers("/health").permitAll() // Simple health endpoint
+                .requestMatchers("/_service", "/_service/**").permitAll() // Federation endpoints
                 .requestMatchers("/graphql").permitAll() // GraphQL handles its own auth
                 .requestMatchers("/graphiql").permitAll() // GraphiQL for development
                 .anyRequest().permitAll()
@@ -54,6 +56,8 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/graphql", configuration);
         source.registerCorsConfiguration("/graphiql", configuration);
+        source.registerCorsConfiguration("/_service/**", configuration);
+        source.registerCorsConfiguration("/health", configuration);
         
         return source;
     }

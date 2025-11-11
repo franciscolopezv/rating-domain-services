@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 /**
  * gRPC service implementation for ratings command operations.
  * Handles rating submissions with proper validation and error handling.
@@ -68,8 +70,15 @@ public class RatingsCommandServiceImpl extends RatingsCommandServiceGrpc.Ratings
             validateRequest(request);
             
             // Create and save the review
+            UUID productId;
+            try {
+                productId = UUID.fromString(request.getProductId().trim());
+            } catch (IllegalArgumentException e) {
+                throw new ValidationException("Invalid product ID format. Must be a valid UUID.");
+            }
+            
             Review review = new Review(
-                request.getProductId().trim(),
+                productId,
                 request.getRating(),
                 !request.getUserId().isEmpty() ? request.getUserId().trim() : null,
                 !request.getReviewText().isEmpty() ? RatingValidationUtils.sanitizeReviewText(request.getReviewText()) : null

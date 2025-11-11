@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service responsible for projecting rating events into read-optimized data structures.
@@ -47,9 +48,12 @@ public class EventProjectionService {
         long startTime = System.currentTimeMillis();
 
         try {
+            // Parse product ID as UUID
+            UUID productId = UUID.fromString(event.getProductId());
+            
             // Get or create product statistics
-            ProductStats productStats = productStatsRepository.findByProductId(event.getProductId())
-                    .orElse(new ProductStats(event.getProductId()));
+            ProductStats productStats = productStatsRepository.findByProductId(productId)
+                    .orElse(new ProductStats(productId));
 
             // Add the new rating to the statistics
             addRatingToStats(productStats, event.getRating());
@@ -169,12 +173,15 @@ public class EventProjectionService {
         logger.info("Recalculating statistics for product: {}", productId);
 
         try {
+            // Parse product ID as UUID
+            UUID uuid = UUID.fromString(productId);
+            
             // This would typically query the write database to get all ratings for the product
             // For now, we'll just ensure the product exists in the stats table
-            Optional<ProductStats> existingStats = productStatsRepository.findByProductId(productId);
+            Optional<ProductStats> existingStats = productStatsRepository.findByProductId(uuid);
             
             if (existingStats.isEmpty()) {
-                ProductStats newStats = new ProductStats(productId);
+                ProductStats newStats = new ProductStats(uuid);
                 productStatsRepository.save(newStats);
                 logger.info("Created empty statistics record for product: {}", productId);
             } else {

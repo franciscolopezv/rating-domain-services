@@ -1,28 +1,6 @@
 # Development overrides for docker-compose.yml
+# Note: Infrastructure services (postgres, kafka, zookeeper) are provided by the platform-infrastructure network
 services:
-  # Add Kafka UI for development
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: ratings-kafka-ui
-    depends_on:
-      kafka:
-        condition: service_healthy
-    ports:
-      - "8080:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
-
-  # Development overrides for services
-  postgres:
-    environment:
-      POSTGRES_USER: ratings_user
-      POSTGRES_PASSWORD: ratings_pass
-      POSTGRES_DB: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
 
   command-service:
     environment:
@@ -60,5 +38,3 @@ services:
       # Mount source code for hot reload (if using spring-boot-devtools)
       - ./query-service/src:/app/src:ro
 
-volumes:
-  postgres_data:

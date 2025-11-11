@@ -9,7 +9,7 @@ import com.ratings.shared.constants.RatingConstants;
  */
 public final class RatingValidationUtils {
     
-    private static final Pattern PRODUCT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
+    private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
     private static final Pattern USER_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
     
     private RatingValidationUtils() {
@@ -27,16 +27,16 @@ public final class RatingValidationUtils {
     }
     
     /**
-     * Validates that a product ID follows the expected format.
+     * Validates that a product ID follows the expected UUID format.
      * 
      * @param productId the product ID to validate
-     * @return true if the product ID is valid, false otherwise
+     * @return true if the product ID is a valid UUID, false otherwise
      */
     public static boolean isValidProductId(String productId) {
-        return productId != null && 
-               !productId.trim().isEmpty() && 
-               productId.length() <= RatingConstants.MAX_PRODUCT_ID_LENGTH &&
-               PRODUCT_ID_PATTERN.matcher(productId).matches();
+        if (productId == null || productId.trim().isEmpty()) {
+            return false;
+        }
+        return UUID_PATTERN.matcher(productId.trim()).matches();
     }
     
     /**

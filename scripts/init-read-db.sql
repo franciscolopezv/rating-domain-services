@@ -3,7 +3,7 @@
 
 -- Create product_stats table
 CREATE TABLE IF NOT EXISTS product_stats (
-    product_id VARCHAR(255) PRIMARY KEY,
+    product_id UUID PRIMARY KEY,
     average_rating DECIMAL(3,2),
     review_count INTEGER DEFAULT 0,
     rating_distribution JSONB,
@@ -34,9 +34,9 @@ CREATE TRIGGER update_product_stats_last_updated
 
 -- Insert sample aggregated data for development
 INSERT INTO product_stats (product_id, average_rating, review_count, rating_distribution) VALUES
-    ('product-1', 4.67, 3, '{"1": 0, "2": 0, "3": 0, "4": 1, "5": 2}'),
-    ('product-2', 3.50, 2, '{"1": 0, "2": 0, "3": 1, "4": 1, "5": 0}'),
-    ('product-3', 2.00, 3, '{"1": 1, "2": 1, "3": 1, "4": 0, "5": 0}')
+    ('550e8400-e29b-41d4-a716-446655440001'::UUID, 4.67, 3, '{"1": 0, "2": 0, "3": 0, "4": 1, "5": 2}'),
+    ('550e8400-e29b-41d4-a716-446655440002'::UUID, 3.50, 2, '{"1": 0, "2": 0, "3": 1, "4": 1, "5": 0}'),
+    ('550e8400-e29b-41d4-a716-446655440003'::UUID, 2.00, 3, '{"1": 1, "2": 1, "3": 1, "4": 0, "5": 0}')
 ON CONFLICT (product_id) DO UPDATE SET
     average_rating = EXCLUDED.average_rating,
     review_count = EXCLUDED.review_count,
@@ -44,7 +44,7 @@ ON CONFLICT (product_id) DO UPDATE SET
     last_updated = CURRENT_TIMESTAMP;
 
 -- Create function to recalculate product statistics
-CREATE OR REPLACE FUNCTION recalculate_product_stats(p_product_id VARCHAR(255))
+CREATE OR REPLACE FUNCTION recalculate_product_stats(p_product_id UUID)
 RETURNS VOID AS $$
 DECLARE
     v_avg_rating DECIMAL(3,2);
